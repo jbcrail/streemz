@@ -323,10 +323,10 @@ func main() {
 				user(client, args[0])
 			}
 		case "help":
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT TWEETS USER")
+			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT SEARCH TWEETS USER")
 		default:
 			fmt.Println("unknown command:", command)
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT TWEETS USER")
+			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT SEARCH TWEETS USER")
 		}
 	}
 }
