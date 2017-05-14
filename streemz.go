@@ -233,6 +233,22 @@ func public(client *twitter.Client) {
 	stream.Stop()
 }
 
+func search(client *twitter.Client, keywords []string) {
+  fmt.Println("search", keywords)
+  search, resp, _ := client.Search.Tweets(&twitter.SearchTweetParams{
+    Query: strings.Join(keywords, " "),
+  })
+
+	if isRateLimitExceeded(resp) {
+		return
+	}
+
+	for _, tweet := range search.Statuses {
+		user := tweet.User
+		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	}
+}
+
 func main() {
 	consumerKey := os.Getenv("CONSUMER_KEY")
 	consumerSecret := os.Getenv("CONSUMER_SECRET")
@@ -290,6 +306,8 @@ func main() {
 			} else {
 				homeTimeline(client, getTweetCount(args[1], 20))
 			}
+    case "search":
+      search(client, args)
 		case "tweets":
 			if len(args) > 1 {
 				userTimeline(client, args[0], getTweetCount(args[1], 20))
