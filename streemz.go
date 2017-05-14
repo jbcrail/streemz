@@ -235,9 +235,9 @@ func public(client *twitter.Client) {
 }
 
 func search(client *twitter.Client, keywords []string) {
-  search, resp, _ := client.Search.Tweets(&twitter.SearchTweetParams{
-    Query: strings.Join(keywords, " "),
-  })
+	search, resp, _ := client.Search.Tweets(&twitter.SearchTweetParams{
+		Query: strings.Join(keywords, " "),
+	})
 
 	if isRateLimitExceeded(resp) {
 		return
@@ -306,8 +306,8 @@ func main() {
 			} else {
 				homeTimeline(client, getTweetCount(args[1], 20))
 			}
-    case "search":
-      search(client, args)
+		case "search":
+			search(client, args)
 		case "tweets":
 			if len(args) > 1 {
 				userTimeline(client, args[0], getTweetCount(args[1], 20))
