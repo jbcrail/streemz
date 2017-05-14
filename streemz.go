@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -39,8 +40,18 @@ func toInt(s string) (int64, error) {
 	return i, err
 }
 
-func printUserStatus(user twitter.User) {
+func printUserSummary(user *twitter.User) {
 	fmt.Printf("%v: followers=%v following=%v statuses=%v likes=%v\n", magenta(user.ScreenName), user.FollowersCount, user.FriendsCount, user.StatusesCount, user.FavouritesCount)
+}
+
+func printUser(user *twitter.User) {
+	fmt.Println(magenta(user.ScreenName))
+	s := reflect.ValueOf(user).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		fmt.Printf("%s:%s = %v\n", typeOfT.Field(i).Name, f.Type(), f.Interface())
+	}
 }
 
 func isRateLimitExceeded(resp *http.Response) bool {
@@ -79,7 +90,7 @@ func myFollowers(client *twitter.Client) {
 		}
 
 		for _, user := range followers.Users {
-			printUserStatus(user)
+			printUserSummary(&user)
 		}
 		if followers.NextCursor == 0 {
 			break
@@ -101,7 +112,7 @@ func followers(client *twitter.Client, name string) {
 		}
 
 		for _, user := range followers.Users {
-			printUserStatus(user)
+			printUserSummary(&user)
 		}
 		if followers.NextCursor == 0 {
 			break
@@ -122,7 +133,7 @@ func myFriends(client *twitter.Client) {
 		}
 
 		for _, user := range friends.Users {
-			printUserStatus(user)
+			printUserSummary(&user)
 		}
 		if friends.NextCursor == 0 {
 			break
@@ -144,7 +155,7 @@ func friends(client *twitter.Client, name string) {
 		}
 
 		for _, user := range friends.Users {
-			printUserStatus(user)
+			printUserSummary(&user)
 		}
 		if friends.NextCursor == 0 {
 			break
@@ -160,7 +171,7 @@ func current(client *twitter.Client) {
 		return
 	}
 
-	fmt.Printf("%#v\n", user)
+	printUser(user)
 }
 
 func user(client *twitter.Client, name string) {
@@ -172,7 +183,7 @@ func user(client *twitter.Client, name string) {
 		return
 	}
 
-	fmt.Printf("%#v\n", user)
+	printUser(user)
 }
 
 func public(client *twitter.Client) {
