@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -269,7 +270,7 @@ func main() {
 
 	for {
 		cmd, err := line.Prompt(defaultPrompt)
-		if err == liner.ErrPromptAborted {
+		if err == liner.ErrPromptAborted || err == io.EOF {
 			break
 		} else if err != nil {
 			log.Print("Error reading line: ", err)
