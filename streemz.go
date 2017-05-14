@@ -63,9 +63,35 @@ func isRateLimitExceeded(resp *http.Response) bool {
 	return false
 }
 
+func getTweetCount(arg string, initial int) int {
+	tweetCount := initial
+	i, err := toInt(arg)
+	if len(arg) > 0 && err == nil {
+		tweetCount = int(i)
+	}
+	return tweetCount
+}
+
 func homeTimeline(client *twitter.Client, count int) {
 	tweets, resp, _ := client.Timelines.HomeTimeline(&twitter.HomeTimelineParams{
 		Count: count,
+	})
+
+	if isRateLimitExceeded(resp) {
+		return
+	}
+
+	for _, tweet := range tweets {
+		user := tweet.User
+		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	}
+}
+
+func userTimeline(client *twitter.Client, name string, count int) {
+	tweets, resp, _ := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
+		ScreenName:      name,
+		Count:           count,
+		IncludeRetweets: twitter.Bool(true),
 	})
 
 	if isRateLimitExceeded(resp) {
@@ -244,20 +270,6 @@ func main() {
 		}
 
 		switch command {
-		case "help":
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT USER")
-		case "recent":
-			tweetCount := 20
-			if len(args) > 0 {
-				i, err := toInt(args[0])
-				if err != nil {
-					fmt.Println("invalid tweet count:", args[0])
-					os.Exit(1)
-				}
-				tweetCount = int(i)
-			}
-
-			homeTimeline(client, tweetCount)
 		case "followers":
 			if len(args) == 0 {
 				myFollowers(client)
@@ -272,15 +284,31 @@ func main() {
 			}
 		case "public":
 			public(client)
+		case "recent":
+			if len(args) == 0 {
+				homeTimeline(client, getTweetCount("", 20))
+			} else {
+				homeTimeline(client, getTweetCount(args[1], 20))
+			}
+		case "tweets":
+			if len(args) > 1 {
+				userTimeline(client, args[0], getTweetCount(args[1], 20))
+			} else if len(args) == 1 {
+				userTimeline(client, args[0], getTweetCount("", 20))
+			} else {
+				fmt.Println("Usage: tweets NAME [N]")
+			}
 		case "user":
 			if len(args) == 0 {
 				current(client)
 			} else {
 				user(client, args[0])
 			}
+		case "help":
+			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT TWEETS USER")
 		default:
 			fmt.Println("unknown command:", command)
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT USER")
+			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT TWEETS USER")
 		}
 	}
 }
