@@ -235,7 +235,6 @@ func public(client *twitter.Client) {
 }
 
 func search(client *twitter.Client, keywords []string) {
-  fmt.Println("search", keywords)
   search, resp, _ := client.Search.Tweets(&twitter.SearchTweetParams{
     Query: strings.Join(keywords, " "),
   })
