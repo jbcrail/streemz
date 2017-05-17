@@ -148,6 +148,34 @@ func followers(client *twitter.Client, name string) {
 	}
 }
 
+func myLikes(client *twitter.Client) {
+	tweets, resp, _ := client.Favorites.List(&twitter.FavoriteListParams{})
+
+	if isRateLimitExceeded(resp) {
+		return
+	}
+
+	for _, tweet := range tweets {
+		user := tweet.User
+		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	}
+}
+
+func likes(client *twitter.Client, name string) {
+	tweets, resp, _ := client.Favorites.List(&twitter.FavoriteListParams{
+		ScreenName: name,
+	})
+
+	if isRateLimitExceeded(resp) {
+		return
+	}
+
+	for _, tweet := range tweets {
+		user := tweet.User
+		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	}
+}
+
 func myFriends(client *twitter.Client) {
 	cursor := int64(-1)
 	for {
@@ -286,6 +314,14 @@ func main() {
 		}
 
 		switch command {
+		case "favorites":
+			fallthrough
+		case "likes":
+			if len(args) == 0 {
+				myLikes(client)
+			} else {
+				likes(client, args[0])
+			}
 		case "followers":
 			if len(args) == 0 {
 				myFollowers(client)
@@ -323,10 +359,10 @@ func main() {
 				user(client, args[0])
 			}
 		case "help":
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT SEARCH TWEETS USER")
+			fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES PUBLIC QUIT RECENT SEARCH TWEETS USER")
 		default:
 			fmt.Println("unknown command:", command)
-			fmt.Println("FOLLOWERS FRIENDS HELP PUBLIC QUIT RECENT SEARCH TWEETS USER")
+			fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES PUBLIC QUIT RECENT SEARCH TWEETS USER")
 		}
 	}
 }
