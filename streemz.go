@@ -55,6 +55,11 @@ func printUser(user *twitter.User) {
 	}
 }
 
+func printTweet(tweet twitter.Tweet) {
+	user := tweet.User
+	fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+}
+
 func isRateLimitExceeded(resp *http.Response) bool {
 	limit, _ := toInt(resp.Header["X-Rate-Limit-Remaining"][0])
 	if limit == 0 {
@@ -83,8 +88,7 @@ func homeTimeline(client *twitter.Client, count int) {
 	}
 
 	for _, tweet := range tweets {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
@@ -98,8 +102,7 @@ func mentionTimeline(client *twitter.Client, count int) {
 	}
 
 	for _, tweet := range tweets {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
@@ -115,8 +118,7 @@ func userTimeline(client *twitter.Client, name string, count int) {
 	}
 
 	for _, tweet := range tweets {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
@@ -171,8 +173,7 @@ func myLikes(client *twitter.Client) {
 	}
 
 	for _, tweet := range tweets {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
@@ -186,8 +187,7 @@ func likes(client *twitter.Client, name string) {
 	}
 
 	for _, tweet := range tweets {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
@@ -264,8 +264,7 @@ func public(client *twitter.Client) {
 
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(*tweet)
 	}
 
 	go demux.HandleChan(stream.Messages)
@@ -287,8 +286,7 @@ func search(client *twitter.Client, keywords []string) {
 	}
 
 	for _, tweet := range search.Statuses {
-		user := tweet.User
-		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+		printTweet(tweet)
 	}
 }
 
