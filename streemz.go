@@ -88,6 +88,21 @@ func homeTimeline(client *twitter.Client, count int) {
 	}
 }
 
+func mentionTimeline(client *twitter.Client, count int) {
+	tweets, resp, _ := client.Timelines.MentionTimeline(&twitter.MentionTimelineParams{
+		Count:           count,
+	})
+
+	if isRateLimitExceeded(resp) {
+		return
+	}
+
+	for _, tweet := range tweets {
+		user := tweet.User
+		fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	}
+}
+
 func userTimeline(client *twitter.Client, name string, count int) {
 	tweets, resp, _ := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
 		ScreenName:      name,
@@ -333,6 +348,12 @@ func main() {
 				myFriends(client)
 			} else {
 				friends(client, args[0])
+			}
+		case "mentions":
+			if len(args) == 0 {
+				mentionTimeline(client, getTweetCount("", 20))
+			} else {
+				mentionTimeline(client, getTweetCount(args[0], 20))
 			}
 		case "public":
 			public(client)
