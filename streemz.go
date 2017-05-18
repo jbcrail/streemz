@@ -292,6 +292,10 @@ func search(client *twitter.Client, keywords []string) {
 	}
 }
 
+func usage() {
+  fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES MENTIONS PUBLIC QUIT RECENT SEARCH TWEETS USER")
+}
+
 func main() {
 	consumerKey := os.Getenv("CONSUMER_KEY")
 	consumerSecret := os.Getenv("CONSUMER_SECRET")
@@ -380,10 +384,10 @@ func main() {
 				user(client, args[0])
 			}
 		case "help":
-			fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES PUBLIC QUIT RECENT SEARCH TWEETS USER")
+      usage()
 		default:
 			fmt.Println("unknown command:", command)
-			fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES PUBLIC QUIT RECENT SEARCH TWEETS USER")
+      usage()
 		}
 	}
 }
