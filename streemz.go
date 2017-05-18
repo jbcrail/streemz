@@ -365,7 +365,7 @@ func main() {
 			if len(args) == 0 {
 				homeTimeline(client, getTweetCount("", 20))
 			} else {
-				homeTimeline(client, getTweetCount(args[1], 20))
+				homeTimeline(client, getTweetCount(args[0], 20))
 			}
 		case "search":
 			search(client, args)
