@@ -4,29 +4,20 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
-	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 	"syscall"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/fatih/color"
 	"github.com/peterh/liner"
 )
 
 const (
 	defaultPrompt = "twitter> "
 	whitespace    = "\t\n\v\f\r "
-)
-
-var (
-	magenta = color.New(color.FgMagenta).SprintFunc()
-	red     = color.New(color.FgRed).SprintFunc()
 )
 
 func parse(s string) (string, []string) {
@@ -36,42 +27,9 @@ func parse(s string) (string, []string) {
 	return strings.ToLower(tokens[0]), tokens[1:]
 }
 
-func toInt(s string) (int64, error) {
-	i, err := strconv.ParseInt(s, 10, 64)
-	return i, err
-}
-
-func printUserSummary(user *twitter.User) {
-	fmt.Printf("%v: followers=%v following=%v statuses=%v likes=%v\n", magenta(user.ScreenName), user.FollowersCount, user.FriendsCount, user.StatusesCount, user.FavouritesCount)
-}
-
-func printUser(user *twitter.User) {
-	fmt.Println(magenta(user.ScreenName))
-	s := reflect.ValueOf(user).Elem()
-	typeOfT := s.Type()
-	for i := 0; i < s.NumField(); i++ {
-		f := s.Field(i)
-		fmt.Printf("%s:%s = %v\n", typeOfT.Field(i).Name, f.Type(), f.Interface())
-	}
-}
-
-func printTweet(tweet twitter.Tweet) {
-	user := tweet.User
-	fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
-}
-
-func isRateLimitExceeded(resp *http.Response) bool {
-	limit, _ := toInt(resp.Header["X-Rate-Limit-Remaining"][0])
-	if limit == 0 {
-		fmt.Println(red("rate limit exceeded"))
-		return true
-	}
-	return false
-}
-
 func getTweetCount(arg string, initial int) int {
 	tweetCount := initial
-	i, err := toInt(arg)
+	i, err := ToInt(arg)
 	if len(arg) > 0 && err == nil {
 		tweetCount = int(i)
 	}
@@ -83,12 +41,12 @@ func homeTimeline(client *twitter.Client, count int) {
 		Count: count,
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
@@ -97,12 +55,12 @@ func mentionTimeline(client *twitter.Client, count int) {
 		Count: count,
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
@@ -113,12 +71,12 @@ func userTimeline(client *twitter.Client, name string, count int) {
 		IncludeRetweets: twitter.Bool(true),
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
@@ -129,12 +87,12 @@ func myFollowers(client *twitter.Client) {
 			Cursor: cursor,
 		})
 
-		if isRateLimitExceeded(resp) {
+		if IsRateLimitExceeded(resp) {
 			break
 		}
 
 		for _, user := range followers.Users {
-			printUserSummary(&user)
+			PrintUserSummary(&user)
 		}
 		if followers.NextCursor == 0 {
 			break
@@ -151,12 +109,12 @@ func followers(client *twitter.Client, name string) {
 			Cursor:     cursor,
 		})
 
-		if isRateLimitExceeded(resp) {
+		if IsRateLimitExceeded(resp) {
 			break
 		}
 
 		for _, user := range followers.Users {
-			printUserSummary(&user)
+			PrintUserSummary(&user)
 		}
 		if followers.NextCursor == 0 {
 			break
@@ -168,12 +126,12 @@ func followers(client *twitter.Client, name string) {
 func myLikes(client *twitter.Client) {
 	tweets, resp, _ := client.Favorites.List(&twitter.FavoriteListParams{})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
@@ -182,12 +140,12 @@ func likes(client *twitter.Client, name string) {
 		ScreenName: name,
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
@@ -198,12 +156,12 @@ func myFriends(client *twitter.Client) {
 			Cursor: cursor,
 		})
 
-		if isRateLimitExceeded(resp) {
+		if IsRateLimitExceeded(resp) {
 			break
 		}
 
 		for _, user := range friends.Users {
-			printUserSummary(&user)
+			PrintUserSummary(&user)
 		}
 		if friends.NextCursor == 0 {
 			break
@@ -220,12 +178,12 @@ func friends(client *twitter.Client, name string) {
 			Cursor:     cursor,
 		})
 
-		if isRateLimitExceeded(resp) {
+		if IsRateLimitExceeded(resp) {
 			break
 		}
 
 		for _, user := range friends.Users {
-			printUserSummary(&user)
+			PrintUserSummary(&user)
 		}
 		if friends.NextCursor == 0 {
 			break
@@ -237,11 +195,11 @@ func friends(client *twitter.Client, name string) {
 func current(client *twitter.Client) {
 	user, resp, _ := client.Accounts.VerifyCredentials(&twitter.AccountVerifyParams{})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
-	printUser(user)
+	PrintUser(user)
 }
 
 func user(client *twitter.Client, name string) {
@@ -249,11 +207,11 @@ func user(client *twitter.Client, name string) {
 		ScreenName: name,
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
-	printUser(user)
+	PrintUser(user)
 }
 
 func public(client *twitter.Client) {
@@ -264,7 +222,7 @@ func public(client *twitter.Client) {
 
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		printTweet(*tweet)
+		PrintTweet(*tweet)
 	}
 
 	go demux.HandleChan(stream.Messages)
@@ -281,12 +239,12 @@ func search(client *twitter.Client, keywords []string) {
 		Query: strings.Join(keywords, " "),
 	})
 
-	if isRateLimitExceeded(resp) {
+	if IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range search.Statuses {
-		printTweet(tweet)
+		PrintTweet(tweet)
 	}
 }
 
