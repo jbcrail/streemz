@@ -90,7 +90,7 @@ func homeTimeline(client *twitter.Client, count int) {
 
 func mentionTimeline(client *twitter.Client, count int) {
 	tweets, resp, _ := client.Timelines.MentionTimeline(&twitter.MentionTimelineParams{
-		Count:           count,
+		Count: count,
 	})
 
 	if isRateLimitExceeded(resp) {
@@ -293,7 +293,7 @@ func search(client *twitter.Client, keywords []string) {
 }
 
 func usage() {
-  fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES MENTIONS PUBLIC QUIT RECENT SEARCH TWEETS USER")
+	fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES MENTIONS PUBLIC QUIT RECENT SEARCH TWEETS USER")
 }
 
 func main() {
@@ -384,10 +384,10 @@ func main() {
 				user(client, args[0])
 			}
 		case "help":
-      usage()
+			usage()
 		default:
 			fmt.Println("unknown command:", command)
-      usage()
+			usage()
 		}
 	}
 }
