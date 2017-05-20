@@ -10,6 +10,7 @@ import (
 
 func Run(client *twitter.Client, args []string) {
 	cmd := flag.NewFlagSet("user", flag.ExitOnError)
+	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
 
@@ -28,5 +29,9 @@ func Run(client *twitter.Client, args []string) {
 		return
 	}
 
-	cmdutil.PrintUser(user)
+	if *json {
+		cmdutil.PrintUserAsJson(user)
+	} else {
+		cmdutil.PrintUser(user)
+	}
 }

@@ -10,6 +10,8 @@ import (
 
 func Run(client *twitter.Client, args []string) {
 	cmd := flag.NewFlagSet("followers", flag.ExitOnError)
+	full := cmd.Bool("full", false, "")
+	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
 
@@ -29,7 +31,13 @@ func Run(client *twitter.Client, args []string) {
 		}
 
 		for _, user := range followers.Users {
-			cmdutil.PrintUserSummary(&user)
+			if *json {
+				cmdutil.PrintUserAsJson(&user)
+			} else if *full {
+				cmdutil.PrintUser(&user)
+			} else {
+				cmdutil.PrintUserSummary(&user)
+			}
 		}
 
 		if followers.NextCursor == 0 {
