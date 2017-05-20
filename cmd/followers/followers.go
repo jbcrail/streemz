@@ -1,58 +1,41 @@
 package followers
 
 import (
+  "flag"
+
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func myFollowers(client *twitter.Client) {
-	cursor := int64(-1)
-	for {
-		followers, resp, _ := client.Followers.List(&twitter.FollowerListParams{
-			Cursor: cursor,
-		})
-
-		if cmdutil.IsRateLimitExceeded(resp) {
-			break
-		}
-
-		for _, user := range followers.Users {
-			cmdutil.PrintUserSummary(&user)
-		}
-		if followers.NextCursor == 0 {
-			break
-		}
-		cursor = followers.NextCursor
-	}
-}
-
-func followers(client *twitter.Client, name string) {
-	cursor := int64(-1)
-	for {
-		followers, resp, _ := client.Followers.List(&twitter.FollowerListParams{
-			ScreenName: name,
-			Cursor:     cursor,
-		})
-
-		if cmdutil.IsRateLimitExceeded(resp) {
-			break
-		}
-
-		for _, user := range followers.Users {
-			cmdutil.PrintUserSummary(&user)
-		}
-		if followers.NextCursor == 0 {
-			break
-		}
-		cursor = followers.NextCursor
-	}
-}
-
 func Run(client *twitter.Client, args []string) {
-	if len(args) == 0 {
-		myFollowers(client)
-	} else {
-		followers(client, args[0])
+  cmd := flag.NewFlagSet("followers", flag.ExitOnError)
+
+  cmd.Parse(args)
+
+  params := twitter.FollowerListParams{
+    Cursor: int64(-1),
+  }
+
+  if cmd.NArg() > 0 {
+    params.ScreenName = cmd.Arg(0)
+  }
+
+	for {
+		followers, resp, _ := client.Followers.List(&params)
+
+		if cmdutil.IsRateLimitExceeded(resp) {
+			break
+		}
+
+		for _, user := range followers.Users {
+			cmdutil.PrintUserSummary(&user)
+		}
+
+		if followers.NextCursor == 0 {
+			break
+		}
+
+		params.Cursor = followers.NextCursor
 	}
 }

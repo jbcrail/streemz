@@ -37,6 +37,15 @@ func PrintUser(user *twitter.User) {
 	}
 }
 
+func PrintUserAsJson(user *twitter.User) {
+	body, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println(red("failed to serialize user to JSON"))
+		return
+	}
+	fmt.Println(string(body))
+}
+
 func PrintTweet(tweet twitter.Tweet) {
 	user := tweet.User
 	fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
