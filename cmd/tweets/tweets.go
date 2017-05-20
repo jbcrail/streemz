@@ -2,7 +2,6 @@ package tweets
 
 import (
 	"flag"
-	"os"
 
 	"github.com/jbcrail/streemz/cmdutil"
 
@@ -12,25 +11,31 @@ import (
 func Run(client *twitter.Client, args []string) {
 	cmd := flag.NewFlagSet("tweets", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
+	retweets := cmd.Bool("retweets", true, "")
+	full := cmd.Bool("full", false, "")
 
 	cmd.Parse(args)
 
-	if cmd.NArg() == 0 {
-		cmd.PrintDefaults()
-		os.Exit(1)
+	params := twitter.UserTimelineParams{
+		Count:           *count,
+		IncludeRetweets: twitter.Bool(*retweets),
 	}
 
-	tweets, resp, _ := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
-		ScreenName:      cmd.Arg(0),
-		Count:           *count,
-		IncludeRetweets: twitter.Bool(true),
-	})
+	if cmd.NArg() > 0 {
+		params.ScreenName = cmd.Arg(0)
+	}
+
+	tweets, resp, _ := client.Timelines.UserTimeline(&params)
 
 	if cmdutil.IsRateLimitExceeded(resp) {
 		return
 	}
 
 	for _, tweet := range tweets {
-		cmdutil.PrintTweet(tweet)
+		if *full {
+			cmdutil.PrintExtendedTweet(tweet)
+		} else {
+			cmdutil.PrintTweet(tweet)
+		}
 	}
 }
