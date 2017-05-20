@@ -1,7 +1,7 @@
 package followers
 
 import (
-  "flag"
+	"flag"
 
 	"github.com/jbcrail/streemz/cmdutil"
 
@@ -9,17 +9,17 @@ import (
 )
 
 func Run(client *twitter.Client, args []string) {
-  cmd := flag.NewFlagSet("followers", flag.ExitOnError)
+	cmd := flag.NewFlagSet("followers", flag.ExitOnError)
 
-  cmd.Parse(args)
+	cmd.Parse(args)
 
-  params := twitter.FollowerListParams{
-    Cursor: int64(-1),
-  }
+	params := twitter.FollowerListParams{
+		Cursor: int64(-1),
+	}
 
-  if cmd.NArg() > 0 {
-    params.ScreenName = cmd.Arg(0)
-  }
+	if cmd.NArg() > 0 {
+		params.ScreenName = cmd.Arg(0)
+	}
 
 	for {
 		followers, resp, _ := client.Followers.List(&params)
