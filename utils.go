@@ -41,6 +41,15 @@ func PrintTweet(tweet twitter.Tweet) {
 	fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
 }
 
+func PrintExtendedTweet(tweet twitter.Tweet) {
+	s := reflect.ValueOf(&tweet).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		fmt.Printf("%s:%s = %v\n", blue(typeOfT.Field(i).Name), green(f.Type()), f.Interface())
+	}
+}
+
 func IsRateLimitExceeded(resp *http.Response) bool {
 	limit, _ := ToInt(resp.Header["X-Rate-Limit-Remaining"][0])
 	if limit == 0 {
