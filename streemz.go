@@ -265,6 +265,74 @@ func main() {
 
 	client := twitter.NewClient(httpClient)
 
+	if len(os.Args) == 1 {
+		RunEvaluatePrintLoop(client)
+	} else {
+		RunEvaluatePrint(client, os.Args[1], os.Args[2:])
+	}
+}
+
+func RunEvaluatePrint(client *twitter.Client, command string, args []string) {
+	switch command {
+	case "favorites":
+		fallthrough
+	case "likes":
+		if len(args) == 0 {
+			myLikes(client)
+		} else {
+			likes(client, args[0])
+		}
+	case "followers":
+		if len(args) == 0 {
+			myFollowers(client)
+		} else {
+			followers(client, args[0])
+		}
+	case "friends":
+		if len(args) == 0 {
+			myFriends(client)
+		} else {
+			friends(client, args[0])
+		}
+	case "mentions":
+		if len(args) == 0 {
+			mentionTimeline(client, getTweetCount("", 20))
+		} else {
+			mentionTimeline(client, getTweetCount(args[0], 20))
+		}
+	case "public":
+		public(client)
+	case "recent":
+		if len(args) == 0 {
+			homeTimeline(client, getTweetCount("", 20))
+		} else {
+			homeTimeline(client, getTweetCount(args[0], 20))
+		}
+	case "search":
+		search(client, args)
+	case "tweets":
+		if len(args) > 1 {
+			userTimeline(client, args[0], getTweetCount(args[1], 20))
+		} else if len(args) == 1 {
+			userTimeline(client, args[0], getTweetCount("", 20))
+		} else {
+			fmt.Println("Usage: tweets NAME [N]")
+		}
+	case "user":
+		if len(args) == 0 {
+			current(client)
+		} else {
+			user(client, args[0])
+		}
+	case "help":
+		usage()
+	default:
+		fmt.Println("unknown command:", command)
+		usage()
+	}
+}
+
+func RunEvaluatePrintLoop(client *twitter.Client) {
 	line := liner.NewLiner()
 	defer line.Close()
 
@@ -288,62 +356,6 @@ func main() {
 			break
 		}
 
-		switch command {
-		case "favorites":
-			fallthrough
-		case "likes":
-			if len(args) == 0 {
-				myLikes(client)
-			} else {
-				likes(client, args[0])
-			}
-		case "followers":
-			if len(args) == 0 {
-				myFollowers(client)
-			} else {
-				followers(client, args[0])
-			}
-		case "friends":
-			if len(args) == 0 {
-				myFriends(client)
-			} else {
-				friends(client, args[0])
-			}
-		case "mentions":
-			if len(args) == 0 {
-				mentionTimeline(client, getTweetCount("", 20))
-			} else {
-				mentionTimeline(client, getTweetCount(args[0], 20))
-			}
-		case "public":
-			public(client)
-		case "recent":
-			if len(args) == 0 {
-				homeTimeline(client, getTweetCount("", 20))
-			} else {
-				homeTimeline(client, getTweetCount(args[0], 20))
-			}
-		case "search":
-			search(client, args)
-		case "tweets":
-			if len(args) > 1 {
-				userTimeline(client, args[0], getTweetCount(args[1], 20))
-			} else if len(args) == 1 {
-				userTimeline(client, args[0], getTweetCount("", 20))
-			} else {
-				fmt.Println("Usage: tweets NAME [N]")
-			}
-		case "user":
-			if len(args) == 0 {
-				current(client)
-			} else {
-				user(client, args[0])
-			}
-		case "help":
-			usage()
-		default:
-			fmt.Println("unknown command:", command)
-			usage()
-		}
+		RunEvaluatePrint(client, command, args)
 	}
 }
