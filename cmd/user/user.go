@@ -1,37 +1,32 @@
 package user
 
 import (
+	"flag"
+
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func current(client *twitter.Client) {
-	user, resp, _ := client.Accounts.VerifyCredentials(&twitter.AccountVerifyParams{})
-
-	if cmdutil.IsRateLimitExceeded(resp) {
-		return
-	}
-
-	cmdutil.PrintUser(user)
-}
-
-func user(client *twitter.Client, name string) {
-	user, resp, _ := client.Users.Show(&twitter.UserShowParams{
-		ScreenName: name,
-	})
-
-	if cmdutil.IsRateLimitExceeded(resp) {
-		return
-	}
-
-	cmdutil.PrintUser(user)
-}
-
 func Run(client *twitter.Client, args []string) {
-	if len(args) == 0 {
-		current(client)
+	cmd := flag.NewFlagSet("user", flag.ExitOnError)
+
+	cmd.Parse(args)
+
+	params := twitter.UserShowParams{}
+
+	if cmd.NArg() > 0 {
+		params.ScreenName = cmd.Arg(0)
 	} else {
-		user(client, args[0])
+		user, _, _ := client.Accounts.VerifyCredentials(&twitter.AccountVerifyParams{})
+		params.ScreenName = user.ScreenName
 	}
+
+	user, resp, _ := client.Users.Show(&params)
+
+	if cmdutil.IsRateLimitExceeded(resp) {
+		return
+	}
+
+	cmdutil.PrintUser(user)
 }
