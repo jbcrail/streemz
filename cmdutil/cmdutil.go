@@ -51,7 +51,12 @@ func PrintExtendedTweet(tweet twitter.Tweet) {
 }
 
 func IsRateLimitExceeded(resp *http.Response) bool {
-	limit, _ := ToInt(resp.Header["X-Rate-Limit-Remaining"][0])
+	val := resp.Header.Get("X-Rate-Limit-Remaining")
+	if val == "" {
+		fmt.Println(red("failed to get rate limit"))
+		return true
+	}
+	limit, _ := ToInt(val)
 	if limit == 0 {
 		fmt.Println(red("rate limit exceeded"))
 		return true
