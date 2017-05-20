@@ -1,6 +1,7 @@
 package cmdutil
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -48,6 +49,15 @@ func PrintExtendedTweet(tweet twitter.Tweet) {
 		f := s.Field(i)
 		fmt.Printf("%s:%s = %v\n", blue(typeOfT.Field(i).Name), green(f.Type()), f.Interface())
 	}
+}
+
+func PrintTweetAsJson(tweet twitter.Tweet) {
+	body, err := json.Marshal(tweet)
+	if err != nil {
+		fmt.Println(red("failed to serialize tweet to JSON"))
+		return
+	}
+	fmt.Println(string(body))
 }
 
 func IsRateLimitExceeded(resp *http.Response) bool {

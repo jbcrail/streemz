@@ -11,6 +11,8 @@ import (
 func Run(client *twitter.Client, args []string) {
 	cmd := flag.NewFlagSet("mentions", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
+	full := cmd.Bool("full", false, "")
+	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
 
@@ -23,6 +25,12 @@ func Run(client *twitter.Client, args []string) {
 	}
 
 	for _, tweet := range tweets {
-		cmdutil.PrintTweet(tweet)
+		if *json {
+			cmdutil.PrintTweetAsJson(tweet)
+		} else if *full {
+			cmdutil.PrintExtendedTweet(tweet)
+		} else {
+			cmdutil.PrintTweet(tweet)
+		}
 	}
 }
