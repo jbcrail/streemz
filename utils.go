@@ -11,6 +11,8 @@ import (
 )
 
 var (
+	blue    = color.New(color.FgBlue).SprintFunc()
+	green   = color.New(color.FgGreen).SprintFunc()
 	magenta = color.New(color.FgMagenta).SprintFunc()
 	red     = color.New(color.FgRed).SprintFunc()
 )
@@ -30,7 +32,7 @@ func PrintUser(user *twitter.User) {
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		f := s.Field(i)
-		fmt.Printf("%s:%s = %v\n", typeOfT.Field(i).Name, f.Type(), f.Interface())
+		fmt.Printf("%s:%s = %v\n", blue(typeOfT.Field(i).Name), green(f.Type()), f.Interface())
 	}
 }
 
