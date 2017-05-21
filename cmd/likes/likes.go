@@ -3,12 +3,13 @@ package likes
 import (
 	"flag"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("likes", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
 	full := cmd.Bool("full", false, "")
@@ -24,7 +25,7 @@ func Run(client *twitter.Client, args []string) {
 		params.ScreenName = cmd.Arg(0)
 	}
 
-	tweets, resp, _ := client.Favorites.List(&params)
+	tweets, resp, _ := client.Twitter.Favorites.List(&params)
 
 	if cmdutil.IsRateLimitExceeded(resp) {
 		return

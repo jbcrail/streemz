@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmd/followers"
 	"github.com/jbcrail/streemz/cmd/friends"
 	"github.com/jbcrail/streemz/cmd/likes"
@@ -18,7 +19,6 @@ import (
 	"github.com/jbcrail/streemz/cmd/tweets"
 	"github.com/jbcrail/streemz/cmd/user"
 
-	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/peterh/liner"
 )
@@ -50,7 +50,7 @@ func main() {
 	token := oauth1.NewToken(accessToken, accessSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
 
-	client := twitter.NewClient(httpClient)
+	client := client.NewClient(httpClient)
 
 	if len(os.Args) == 1 {
 		RunEvaluatePrintLoop(client)
@@ -59,7 +59,7 @@ func main() {
 	}
 }
 
-func RunEvaluatePrint(client *twitter.Client, command string, args []string) {
+func RunEvaluatePrint(client *client.Client, command string, args []string) {
 	switch command {
 	case "favorites":
 		fallthrough
@@ -89,7 +89,7 @@ func RunEvaluatePrint(client *twitter.Client, command string, args []string) {
 	}
 }
 
-func RunEvaluatePrintLoop(client *twitter.Client) {
+func RunEvaluatePrintLoop(client *client.Client) {
 	line := liner.NewLiner()
 	defer line.Close()
 

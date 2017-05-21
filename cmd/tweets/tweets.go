@@ -3,12 +3,13 @@ package tweets
 import (
 	"flag"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("tweets", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
 	retweets := cmd.Bool("retweets", true, "")
@@ -26,7 +27,7 @@ func Run(client *twitter.Client, args []string) {
 		params.ScreenName = cmd.Arg(0)
 	}
 
-	tweets, resp, _ := client.Timelines.UserTimeline(&params)
+	tweets, resp, _ := client.Twitter.Timelines.UserTimeline(&params)
 
 	if cmdutil.IsRateLimitExceeded(resp) {
 		return

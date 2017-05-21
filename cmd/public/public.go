@@ -6,12 +6,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("public", flag.ExitOnError)
 	filter := cmd.String("filter", "", "")
 	full := cmd.Bool("full", false, "")
@@ -25,13 +26,13 @@ func Run(client *twitter.Client, args []string) {
 		params := &twitter.StreamSampleParams{
 			StallWarnings: twitter.Bool(true),
 		}
-		stream, _ = client.Streams.Sample(params)
+		stream, _ = client.Twitter.Streams.Sample(params)
 	} else {
 		params := &twitter.StreamFilterParams{
 			StallWarnings: twitter.Bool(true),
 			Track:         []string{*filter},
 		}
-		stream, _ = client.Streams.Filter(params)
+		stream, _ = client.Twitter.Streams.Filter(params)
 	}
 
 	demux := twitter.NewSwitchDemux()

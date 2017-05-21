@@ -4,19 +4,20 @@ import (
 	"flag"
 	"strings"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("search", flag.ExitOnError)
 	full := cmd.Bool("full", false, "")
 	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
 
-	search, resp, _ := client.Search.Tweets(&twitter.SearchTweetParams{
+	search, resp, _ := client.Twitter.Search.Tweets(&twitter.SearchTweetParams{
 		Query: strings.Join(cmd.Args(), " "),
 	})
 

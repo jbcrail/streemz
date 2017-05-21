@@ -3,12 +3,13 @@ package followers
 import (
 	"flag"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("followers", flag.ExitOnError)
 	full := cmd.Bool("full", false, "")
 	json := cmd.Bool("json", false, "")
@@ -24,7 +25,7 @@ func Run(client *twitter.Client, args []string) {
 	}
 
 	for {
-		followers, resp, _ := client.Followers.List(&params)
+		followers, resp, _ := client.Twitter.Followers.List(&params)
 
 		if cmdutil.IsRateLimitExceeded(resp) {
 			break

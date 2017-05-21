@@ -3,12 +3,13 @@ package mentions
 import (
 	"flag"
 
+	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func Run(client *twitter.Client, args []string) {
+func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("mentions", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
 	full := cmd.Bool("full", false, "")
@@ -16,7 +17,7 @@ func Run(client *twitter.Client, args []string) {
 
 	cmd.Parse(args)
 
-	tweets, resp, _ := client.Timelines.MentionTimeline(&twitter.MentionTimelineParams{
+	tweets, resp, _ := client.Twitter.Timelines.MentionTimeline(&twitter.MentionTimelineParams{
 		Count: *count,
 	})
 
