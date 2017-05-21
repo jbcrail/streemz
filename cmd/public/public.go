@@ -13,15 +13,26 @@ import (
 
 func Run(client *twitter.Client, args []string) {
 	cmd := flag.NewFlagSet("public", flag.ExitOnError)
+	filter := cmd.String("filter", "", "")
 	full := cmd.Bool("full", false, "")
 	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
 
-	params := &twitter.StreamSampleParams{
-		StallWarnings: twitter.Bool(true),
+	var stream *twitter.Stream
+
+	if *filter == "" {
+		params := &twitter.StreamSampleParams{
+			StallWarnings: twitter.Bool(true),
+		}
+		stream, _ = client.Streams.Sample(params)
+	} else {
+		params := &twitter.StreamFilterParams{
+			StallWarnings: twitter.Bool(true),
+			Track:         []string{*filter},
+		}
+		stream, _ = client.Streams.Filter(params)
 	}
-	stream, _ := client.Streams.Sample(params)
 
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
