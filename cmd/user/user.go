@@ -20,7 +20,7 @@ func Run(client *client.Client, args []string) {
 	if cmd.NArg() > 0 {
 		params.ScreenName = cmd.Arg(0)
 	} else {
-		user, _, _ := client.Twitter.Accounts.VerifyCredentials(&twitter.AccountVerifyParams{})
+		user := client.AuthorizedUser()
 		params.ScreenName = user.ScreenName
 	}
 
