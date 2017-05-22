@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/fatih/color"
@@ -13,6 +15,7 @@ import (
 
 var (
 	blue    = color.New(color.FgBlue).SprintFunc()
+	bold    = color.New(color.Bold).SprintFunc()
 	green   = color.New(color.FgGreen).SprintFunc()
 	magenta = color.New(color.FgMagenta).SprintFunc()
 	red     = color.New(color.FgRed).SprintFunc()
@@ -21,6 +24,15 @@ var (
 func ToInt(s string) (int64, error) {
 	i, err := strconv.ParseInt(s, 10, 64)
 	return i, err
+}
+
+func IndentTextBlock(s string) string {
+	return "\t" + strings.Replace(strings.TrimRight(s, "\n"), "\n", "\n\t", -1)
+}
+
+func LocalizeTime(s string) string {
+	t, _ := time.Parse(time.RubyDate, s)
+	return t.Local().String()
 }
 
 func PrintUserSummary(user *twitter.User) {
@@ -48,7 +60,16 @@ func PrintUserAsJson(user *twitter.User) {
 
 func PrintTweet(tweet twitter.Tweet) {
 	user := tweet.User
-	fmt.Printf("[%v] %v\n", magenta(user.ScreenName), tweet.Text)
+	fmt.Printf("%v - @%v - %v\n", bold(user.Name), magenta(user.ScreenName), LocalizeTime(tweet.CreatedAt))
+	fmt.Printf("https://twitter.com/%v/status/%v\n", user.ScreenName, tweet.IDStr)
+	fmt.Println(IndentTextBlock(tweet.Text))
+	retweets := tweet.RetweetCount
+	likes := tweet.FavoriteCount
+	if tweet.RetweetedStatus != nil {
+		retweets = tweet.RetweetedStatus.RetweetCount
+		likes = tweet.RetweetedStatus.FavoriteCount
+	}
+	fmt.Printf("\t⇄ %v  ❤ %v\n", blue(retweets), green(likes))
 }
 
 func PrintExtendedTweet(tweet twitter.Tweet) {
