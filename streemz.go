@@ -24,8 +24,7 @@ import (
 )
 
 const (
-	defaultPrompt = "twitter> "
-	whitespace    = "\t\n\v\f\r "
+	whitespace = "\t\n\v\f\r "
 )
 
 func parse(s string) (string, []string) {
@@ -53,7 +52,9 @@ func main() {
 	client := client.NewClient(httpClient)
 
 	if len(os.Args) == 1 {
-		RunEvaluatePrintLoop(client)
+		user := client.AuthorizedUser()
+		prompt := fmt.Sprintf("[@%v]: ", user.ScreenName)
+		RunEvaluatePrintLoop(client, prompt)
 	} else {
 		RunEvaluatePrint(client, os.Args[1], os.Args[2:])
 	}
@@ -89,14 +90,14 @@ func RunEvaluatePrint(client *client.Client, command string, args []string) {
 	}
 }
 
-func RunEvaluatePrintLoop(client *client.Client) {
+func RunEvaluatePrintLoop(client *client.Client, prompt string) {
 	line := liner.NewLiner()
 	defer line.Close()
 
 	line.SetCtrlCAborts(true)
 
 	for {
-		cmd, err := line.Prompt(defaultPrompt)
+		cmd, err := line.Prompt(prompt)
 		if err == liner.ErrPromptAborted || err == io.EOF {
 			break
 		} else if err != nil {
