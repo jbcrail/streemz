@@ -19,6 +19,9 @@ var (
 	green   = color.New(color.FgGreen).SprintFunc()
 	magenta = color.New(color.FgMagenta).SprintFunc()
 	red     = color.New(color.FgRed).SprintFunc()
+
+	likes_icon   = "\u2764"
+	retweet_icon = "\u21C4"
 )
 
 func ToInt(s string) (int64, error) {
@@ -69,7 +72,8 @@ func PrintTweet(tweet twitter.Tweet) {
 		retweets = tweet.RetweetedStatus.RetweetCount
 		likes = tweet.RetweetedStatus.FavoriteCount
 	}
-	fmt.Printf("\t⇄ %v  ❤ %v\n", blue(retweets), green(likes))
+	fmt.Printf("\t%v %v", retweet_icon, blue(retweets))
+	fmt.Printf("  %v %v\n", likes_icon, green(likes))
 }
 
 func PrintExtendedTweet(tweet twitter.Tweet) {
