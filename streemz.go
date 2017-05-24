@@ -14,7 +14,7 @@ import (
 	"github.com/jbcrail/streemz/cmd/likes"
 	"github.com/jbcrail/streemz/cmd/mentions"
 	"github.com/jbcrail/streemz/cmd/public"
-	"github.com/jbcrail/streemz/cmd/recent"
+	"github.com/jbcrail/streemz/cmd/home"
 	"github.com/jbcrail/streemz/cmd/search"
 	"github.com/jbcrail/streemz/cmd/tweets"
 	"github.com/jbcrail/streemz/cmd/user"
@@ -74,8 +74,8 @@ func RunEvaluatePrint(client *client.Client, command string, args []string) {
 		mentions.Run(client, args)
 	case "public":
 		public.Run(client, args)
-	case "recent":
-		recent.Run(client, args)
+	case "home":
+		home.Run(client, args)
 	case "search":
 		search.Run(client, args)
 	case "tweets":

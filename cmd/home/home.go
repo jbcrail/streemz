@@ -17,9 +17,11 @@ func Run(client *client.Client, args []string) {
 
 	cmd.Parse(args)
 
-	tweets, resp, _ := client.Twitter.Timelines.HomeTimeline(&twitter.HomeTimelineParams{
+	params := twitter.HomeTimelineParams{
 		Count: *count,
-	})
+	}
+
+	tweets, resp, _ := client.Twitter.Timelines.HomeTimeline(&params)
 
 	if cmdutil.IsRateLimitExceeded(resp) {
 		return

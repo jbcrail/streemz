@@ -4,8 +4,8 @@
 followers [NAME]
 friends [NAME]
 help
+home [N]
 public
 quit
-recent [N]
 user [NAME]
 ```
