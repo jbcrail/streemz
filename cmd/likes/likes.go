@@ -12,6 +12,8 @@ import (
 func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("likes", flag.ExitOnError)
 	count := cmd.Int("count", 20, "")
+	maximum := cmd.Int64("max", 0, "")
+	minimum := cmd.Int64("min", 0, "")
 	full := cmd.Bool("full", false, "")
 	json := cmd.Bool("json", false, "")
 
@@ -19,6 +21,16 @@ func Run(client *client.Client, args []string) {
 
 	params := twitter.FavoriteListParams{
 		Count: *count,
+	}
+
+	if *maximum > 0 {
+		// MaxID is inclusive
+		params.MaxID = *maximum
+	}
+
+	if *minimum > 0 {
+		// SinceID is exclusive, so we subtract 1 for consistency with maximum
+		params.SinceID = *minimum - 1
 	}
 
 	if cmd.NArg() > 0 {
