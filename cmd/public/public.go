@@ -2,6 +2,7 @@ package public
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,6 +36,8 @@ func Run(client *client.Client, args []string) {
 		stream, _ = client.Twitter.Streams.Filter(params)
 	}
 
+	fmt.Println()
+
 	demux := twitter.NewSwitchDemux()
 	demux.Tweet = func(tweet *twitter.Tweet) {
 		if *json {
@@ -43,6 +46,7 @@ func Run(client *client.Client, args []string) {
 			cmdutil.PrintExtendedTweet(*tweet)
 		} else {
 			cmdutil.PrintTweet(*tweet)
+			fmt.Println()
 		}
 	}
 

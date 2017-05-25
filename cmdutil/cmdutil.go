@@ -30,7 +30,7 @@ func ToInt(s string) (int64, error) {
 }
 
 func IndentTextBlock(s string) string {
-	return "\t" + strings.Replace(strings.TrimRight(s, "\n"), "\n", "\n\t", -1)
+	return "    " + strings.Replace(strings.TrimRight(s, "\n"), "\n", "\n    ", -1)
 }
 
 func LocalizeTime(s string) string {
@@ -63,17 +63,17 @@ func PrintUserAsJson(user *twitter.User) {
 
 func PrintTweet(tweet twitter.Tweet) {
 	user := tweet.User
-	fmt.Printf("%v - @%v - %v\n", bold(user.Name), magenta(user.ScreenName), LocalizeTime(tweet.CreatedAt))
-	fmt.Printf("https://twitter.com/%v/status/%v\n", user.ScreenName, tweet.IDStr)
-	fmt.Println(IndentTextBlock(tweet.Text))
+	s := fmt.Sprintf("%v - @%v - %v\n", bold(user.Name), magenta(user.ScreenName), LocalizeTime(tweet.CreatedAt))
+	s += fmt.Sprintf("https://twitter.com/%v/status/%v\n", user.ScreenName, tweet.IDStr)
+	s += fmt.Sprintln(IndentTextBlock(tweet.Text))
 	retweets := tweet.RetweetCount
 	likes := tweet.FavoriteCount
 	if tweet.RetweetedStatus != nil {
 		retweets = tweet.RetweetedStatus.RetweetCount
 		likes = tweet.RetweetedStatus.FavoriteCount
 	}
-	fmt.Printf("\t%v %v", retweet_icon, blue(retweets))
-	fmt.Printf("  %v %v\n", likes_icon, green(likes))
+	s += fmt.Sprintf("    %v %v  %v %v", retweet_icon, blue(retweets), likes_icon, green(likes))
+	fmt.Println(IndentTextBlock(s))
 }
 
 func PrintExtendedTweet(tweet twitter.Tweet) {

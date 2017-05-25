@@ -2,6 +2,7 @@ package likes
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/jbcrail/streemz/client"
 	"github.com/jbcrail/streemz/cmdutil"
@@ -43,13 +44,17 @@ func Run(client *client.Client, args []string) {
 		return
 	}
 
-	for _, tweet := range tweets {
+	for i, tweet := range tweets {
 		if *json {
 			cmdutil.PrintTweetAsJson(tweet)
 		} else if *full {
 			cmdutil.PrintExtendedTweet(tweet)
 		} else {
+			if i == 0 {
+				fmt.Println()
+			}
 			cmdutil.PrintTweet(tweet)
+			fmt.Println()
 		}
 	}
 }

@@ -2,6 +2,7 @@ package search
 
 import (
 	"flag"
+	"fmt"
 	"strings"
 
 	"github.com/jbcrail/streemz/client"
@@ -25,13 +26,17 @@ func Run(client *client.Client, args []string) {
 		return
 	}
 
-	for _, tweet := range search.Statuses {
+	for i, tweet := range search.Statuses {
 		if *json {
 			cmdutil.PrintTweetAsJson(tweet)
 		} else if *full {
 			cmdutil.PrintExtendedTweet(tweet)
 		} else {
+			if i == 0 {
+				fmt.Println()
+			}
 			cmdutil.PrintTweet(tweet)
+			fmt.Println()
 		}
 	}
 }
