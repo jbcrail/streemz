@@ -11,6 +11,7 @@ import (
 
 func Run(client *client.Client, args []string) {
 	cmd := flag.NewFlagSet("user", flag.ExitOnError)
+	full := cmd.Bool("full", false, "")
 	json := cmd.Bool("json", false, "")
 
 	cmd.Parse(args)
@@ -32,7 +33,9 @@ func Run(client *client.Client, args []string) {
 
 	if *json {
 		cmdutil.PrintUserAsJson(user)
-	} else {
+	} else if *full {
 		cmdutil.PrintUser(user)
+	} else {
+		cmdutil.PrintUserSummary(user)
 	}
 }

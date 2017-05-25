@@ -30,7 +30,11 @@ func ToInt(s string) (int64, error) {
 }
 
 func IndentTextBlock(s string) string {
-	return "    " + strings.Replace(strings.TrimRight(s, "\n"), "\n", "\n    ", -1)
+	lines := strings.Split(s, "\n")
+	if lines[len(lines)-1] == "" {
+		return "    " + strings.Join(lines[0:len(lines)-1], "\n    ") + "\n"
+	}
+	return "    " + strings.Join(lines, "\n    ")
 }
 
 func LocalizeTime(s string) string {
@@ -39,7 +43,25 @@ func LocalizeTime(s string) string {
 }
 
 func PrintUserSummary(user *twitter.User) {
-	fmt.Printf("%v: followers=%v following=%v statuses=%v likes=%v\n", magenta(user.ScreenName), user.FollowersCount, user.FriendsCount, user.StatusesCount, user.FavouritesCount)
+	s := fmt.Sprintf("%v %v : ", blue(user.Name), magenta("@"+user.ScreenName))
+	s += fmt.Sprintf("%v tweets  %v likes  ", user.StatusesCount, user.FavouritesCount)
+	s += fmt.Sprintf("%v following  %v followers\n", user.FriendsCount, user.FollowersCount)
+
+	if user.ProfileImageURLHttps != "" {
+		s += IndentTextBlock(fmt.Sprintf("Profile photo: %v\n", user.ProfileImageURLHttps))
+	}
+
+	if user.Location != "" {
+		s += IndentTextBlock(fmt.Sprintf("Location: %v\n", user.Location))
+	}
+
+	if user.URL != "" {
+		s += IndentTextBlock(fmt.Sprintf("URL: %v\n", user.URL))
+	}
+
+	s += IndentTextBlock(fmt.Sprintf("Joined on %v\n", user.CreatedAt))
+
+	fmt.Print(IndentTextBlock(s))
 }
 
 func PrintUser(user *twitter.User) {
