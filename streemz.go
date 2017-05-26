@@ -27,6 +27,8 @@ const (
 	whitespace = "\t\n\v\f\r "
 )
 
+var commands = []string{"favorites", "followers", "friends", "help", "home", "likes", "mentions", "public", "search", "tweets", "user"}
+
 func parse(s string) (string, []string) {
 	parser := regexp.MustCompile("[" + whitespace + "]+")
 	s = strings.Trim(s, whitespace)
@@ -35,7 +37,7 @@ func parse(s string) (string, []string) {
 }
 
 func usage() {
-	fmt.Println("FAVORITES FOLLOWERS FRIENDS HELP LIKES MENTIONS PUBLIC QUIT RECENT SEARCH TWEETS USER")
+	fmt.Println(strings.Join(commands, " "))
 }
 
 func main() {
@@ -95,6 +97,15 @@ func RunEvaluatePrintLoop(client *client.Client, prompt string) {
 	defer line.Close()
 
 	line.SetCtrlCAborts(true)
+
+	line.SetCompleter(func(line string) (c []string) {
+		for _, n := range commands {
+			if strings.HasPrefix(n, strings.ToLower(line)) {
+				c = append(c, n)
+			}
+		}
+		return
+	})
 
 	for {
 		cmd, err := line.Prompt(prompt)
